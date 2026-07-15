@@ -29,7 +29,7 @@ app.use(cors());
  */
 
 app.get('/',(req,res) => {
-  res.status(400).json({"message":"Server is Running"})
+  res.json({"message":"Server is Running"})
 })
 
 app.post('/interactions', verifyKeyMiddleware(process.env.PUBLIC_KEY), async function (req, res) {
@@ -137,7 +137,7 @@ app.post('/interactions', verifyKeyMiddleware(process.env.PUBLIC_KEY), async fun
       const orgs = await response.json();
 
       const reporesponse = await fetch(
-          `https://api.github.com/orgs/${org}/repos?per_page=25`
+          `https://api.github.com/orgs/${org}/repos?per_page=10`
       );
 
       const repos = await reporesponse.json();
