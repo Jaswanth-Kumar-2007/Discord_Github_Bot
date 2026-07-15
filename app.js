@@ -18,10 +18,19 @@ const PORT = process.env.PORT || 3000;
 // To keep track of our active games
 const activeGames = {};
 
+const cors = require('cors');
+
+app.use(cors());
+
 /**
  * Interactions endpoint URL where Discord will send HTTP requests
  * Parse request body and verifies incoming requests using discord-interactions package
  */
+
+app.get('/',(req,res) => {
+  console.log('Server is Running Successfully');
+})
+
 app.post('/interactions', verifyKeyMiddleware(process.env.PUBLIC_KEY), async function (req, res) {
   // Interaction id, type and data
   const { id, type, data } = req.body;
@@ -114,6 +123,9 @@ app.post('/interactions', verifyKeyMiddleware(process.env.PUBLIC_KEY), async fun
   console.error('unknown interaction type', type);
   return res.status(400).json({ error: 'unknown interaction type' });
 });
+
+
+// Server is Running on PORT
 
 app.listen(PORT, () => {
   console.log('Listening on port', PORT);

@@ -3,19 +3,19 @@ import { getRPSChoices } from './game.js';
 import { capitalize, InstallGuildCommands } from './utils.js';
 
 // Get the game choices from game.js
-function createCommandChoices() {
-  const choices = getRPSChoices();
-  const commandChoices = [];
+// function createCommandChoices() {
+//   const choices = getRPSChoices();
+//   const commandChoices = [];
 
-  for (let choice of choices) {
-    commandChoices.push({
-      name: capitalize(choice),
-      value: choice.toLowerCase(),
-    });
-  }
+//   for (let choice of choices) {
+//     commandChoices.push({
+//       name: capitalize(choice),
+//       value: choice.toLowerCase(),
+//     });
+//   }
 
-  return commandChoices;
-}
+//   return commandChoices;
+// }
 
 // Simple test command
 const TEST_COMMAND = {
