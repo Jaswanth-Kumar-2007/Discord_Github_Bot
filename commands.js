@@ -81,7 +81,7 @@ const PR_COMMAND = {
   contexts: [0, 1, 2],
 }
 
-const ALL_COMMANDS = [TEST_COMMAND,GITHUB_COMMAND,ORG_COMMAND];
+const ALL_COMMANDS = [TEST_COMMAND,GITHUB_COMMAND,ORG_COMMAND,PR_COMMAND];
 
 console.log("Registering commands...");
 // await InstallGlobalCommands(process.env.APP_ID, ALL_COMMANDS);
