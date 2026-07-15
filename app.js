@@ -18,7 +18,7 @@ const PORT = process.env.PORT || 3000;
 // To keep track of our active games
 const activeGames = {};
 
-const cors = require('cors');
+import cors from 'cors';
 
 app.use(cors());
 
