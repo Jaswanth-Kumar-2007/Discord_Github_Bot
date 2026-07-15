@@ -73,6 +73,14 @@ const ORG_COMMAND = {
   contexts: [0, 1, 2],
 }
 
+const PR_COMMAND = {
+  name:'canonforces',
+  description:'Pull Requests of Canonforces',
+  type:1,
+  integration_types: [0, 1],
+  contexts: [0, 1, 2],
+}
+
 const ALL_COMMANDS = [TEST_COMMAND,GITHUB_COMMAND,ORG_COMMAND];
 
 console.log("Registering commands...");

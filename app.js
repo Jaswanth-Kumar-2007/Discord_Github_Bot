@@ -127,6 +127,39 @@ app.post('/interactions', verifyKeyMiddleware(process.env.PUBLIC_KEY), async fun
 
     }
 
+    if (name === "canonforces"){
+
+      const response = await fetch(
+        'https://api.github.com/repos/OpenLake/canonforces/pulls'
+      )
+
+      const pr = await response.json();
+
+      let count = pr.length;
+
+      const fields = pr.slice(0, 5).map((pull) => ({
+          name: `📌 ${pull.title}`,
+          value:
+              `👤 **Author:** ${pull.user.login}\n` +
+              `🟢 **State:** ${pull.state}\n` +
+              `📅 **Created:** ${pull.created_at.substring(0,10)}\n` +
+              `[View Pull Request](${pull.html_url})`
+      }));
+
+      return res.send({
+          type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+          data: {
+              embeds: [
+                  {
+                      title: "Open Pull Requests",
+                      description: `Total Open PRs: ${pr.length}`,
+                      fields
+                  }
+              ]
+          }
+      });
+    }
+
     if(name === "orgs"){
       const org = data.options[0].value;
 
@@ -136,13 +169,13 @@ app.post('/interactions', verifyKeyMiddleware(process.env.PUBLIC_KEY), async fun
 
       const orgs = await response.json();
 
-      const reporesponse = await fetch(
-          `https://api.github.com/orgs/${org}/repos?per_page=10`
-      );
+      // const reporesponse = await fetch(
+      //     `https://api.github.com/orgs/${org}/repos?per_page=10`
+      // );
 
-      const repos = await reporesponse.json();
+      // const repos = await reporesponse.json();
 
-      const repoList = repos.map(repo => `[${repo.name}](${repo.html_url})`).join("\n");
+      // const repoList = repos.map(repo => `[${repo.name}](${repo.html_url})`).join("\n");
 
       // const options = repos.map((repo) => ({
       //     label: repo.name,
@@ -177,10 +210,6 @@ app.post('/interactions', verifyKeyMiddleware(process.env.PUBLIC_KEY), async fun
                             name: "Repositories",
                             value: `${orgs.public_repos}`,
                             inline: true
-                        },
-                        {
-                          name: " Repositories List",
-                          value: repoList
                         }
               ],
             }]
@@ -199,7 +228,7 @@ app.post('/interactions', verifyKeyMiddleware(process.env.PUBLIC_KEY), async fun
         // custom_id set in payload when sending message component
         const componentId = data.custom_id;
         // user who clicked button
-        const userId = req.body.member.user.id;
+        const userId = req.body.member.user.id || "User" ;
 
         if (componentId === 'my_button') {
           console.log(req.body);
