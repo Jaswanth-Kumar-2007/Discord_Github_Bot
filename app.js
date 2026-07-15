@@ -79,7 +79,6 @@ app.post('/interactions', verifyKeyMiddleware(process.env.PUBLIC_KEY), async fun
         },
       });
     }
-  }
 
 
 
@@ -213,7 +212,7 @@ app.post('/interactions', verifyKeyMiddleware(process.env.PUBLIC_KEY), async fun
 
   console.error('unknown interaction type', type);
   return res.status(400).json({ error: 'unknown interaction type' });
-});
+}});
 
 
 // Server is Running on PORT
