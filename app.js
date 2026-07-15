@@ -28,7 +28,7 @@ app.use(cors());
  */
 
 app.get('/',(req,res) => {
-  console.log('Server is Running Successfully');
+  res.status(400).json({"message":"Server is Running"})
 })
 
 app.post('/interactions', verifyKeyMiddleware(process.env.PUBLIC_KEY), async function (req, res) {
