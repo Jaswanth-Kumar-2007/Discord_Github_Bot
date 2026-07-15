@@ -1,5 +1,5 @@
 import 'dotenv/config';
-import { getRPSChoices } from './game.js';
+// import { getRPSChoices } from './game.js';
 import { capitalize, InstallGuildCommands } from './utils.js';
 
 // Get the game choices from game.js
