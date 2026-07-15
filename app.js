@@ -1,297 +1,223 @@
 import 'dotenv/config';
 import express from 'express';
+
 import {
+  ButtonStyleTypes,
+  InteractionResponseFlags,
   InteractionResponseType,
   InteractionType,
+  MessageComponentTypes,
   verifyKeyMiddleware,
 } from 'discord-interactions';
-import cors from 'cors';
-import { getRandomEmoji } from './utils.js';
 
+import { getRandomEmoji, DiscordRequest } from './utils.js';
+
+
+// Create an express app
 const app = express();
+// Get port, or default to 3000
 const PORT = process.env.PORT || 3000;
+// To keep track of our active games
+
+import cors from 'cors';
 
 app.use(cors());
 
-app.get('/', (req, res) => {
-  res.json({ message: 'Server is Running' });
-});
+/**
+ * Interactions endpoint URL where Discord will send HTTP requests
+ * Parse request body and verifies incoming requests using discord-interactions package
+ */
 
-app.post(
-  '/interactions',
-  verifyKeyMiddleware(process.env.PUBLIC_KEY),
-  async (req, res) => {
+app.get('/',(req,res) => {
+  res.status(400).json({"message":"Server is Running"})
+})
 
-    const { type, data } = req.body;
+app.post('/interactions', verifyKeyMiddleware(process.env.PUBLIC_KEY), async function (req, res) {
+  // Interaction id, type and data
+  const { id, type, data } = req.body;
 
-    // Discord verification
-    if (type === InteractionType.PING) {
+  /**
+   * Handle verification requests
+   */
+  if (type === InteractionType.PING) {
+    return res.send({ type: InteractionResponseType.PONG });
+  }
+
+  /**
+   * Handle slash command requests
+   * See https://discord.com/developers/docs/interactions/application-commands#slash-commands
+   */
+  if (type === InteractionType.APPLICATION_COMMAND) {
+    const { name } = data;
+
+    // "test" command
+    if (name === 'test') {
+      // Send a message into the channel where command was triggered from
       return res.send({
-        type: InteractionResponseType.PONG,
+        type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+        data: {
+          flags: InteractionResponseFlags.IS_COMPONENTS_V2,
+          components: [
+            {
+              type: MessageComponentTypes.TEXT_DISPLAY,
+              // Fetches a random emoji to send from a helper function
+              content: `Bot is Running Successfully ${getRandomEmoji()}`
+            },
+            {
+              type: MessageComponentTypes.ACTION_ROW,
+              components: [
+                {
+                  type: MessageComponentTypes.BUTTON,
+                  // Value for your app to identify the button
+                  custom_id: 'my_button',
+                  label: 'Click',
+                  style: ButtonStyleTypes.PRIMARY,
+                },
+              ],
+            },
+          ],
+        },
       });
     }
+  }
 
-    // -----------------------------
-    // Slash Commands
-    // -----------------------------
-    if (type === InteractionType.APPLICATION_COMMAND) {
+          /**
+           * Handle requests from interactive components
+           */
+          if (type === InteractionType.MESSAGE_COMPONENT) {
+            // custom_id set in payload when sending message component
+            const componentId = data.custom_id;
+            // user who clicked button
+            const userId = req.body.member.user.id;
 
-      const { name } = data;
-
-      // ---------------- TEST ----------------
-
-      if (name === 'test') {
-        return res.send({
-          type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
-          data: {
-            content: `Hello World ${getRandomEmoji()}`
-          }
-        });
-      }
-
-      // ---------------- GITHUB USER ----------------
-
-      if (name === 'github') {
-
-        const username = data.options[0].value;
-
-        const response = await fetch(
-          `https://api.github.com/users/${username}`
-        );
-
-        if (!response.ok) {
-          return res.send({
-            type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
-            data: {
-              content: "❌ GitHub user not found."
+            if (componentId === 'my_button') {
+              console.log(req.body);
+              return res.send({
+                type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+                data: { content: `<@${userId}> clicked the button` },
+              });
             }
-          });
-        }
-
-        const user = await response.json();
-
-        return res.send({
-          type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
-          data: {
-            embeds: [
-              {
-                title: user.login,
-                description: user.bio || "No bio available",
-                url: user.html_url,
-
-                thumbnail: {
-                  url: user.avatar_url
-                },
-
-                fields: [
-                  {
-                    name: "Followers",
-                    value: String(user.followers),
-                    inline: true
-                  },
-                  {
-                    name: "Following",
-                    value: String(user.following),
-                    inline: true
-                  },
-                  {
-                    name: "Repositories",
-                    value: String(user.public_repos),
-                    inline: true
-                  }
-                ]
-              }
-            ]
           }
-        });
-      }
 
-      // ---------------- ORGANIZATION ----------------
 
-      if (name === "orgs") {
+    if(name==="github"){
 
-        const org = data.options[0].value;
-
-        const orgResponse = await fetch(
-          `https://api.github.com/orgs/${org}`
-        );
-
-        if (!orgResponse.ok) {
-          return res.send({
-            type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
-            data: {
-              content: "❌ Organization not found."
-            }
-          });
-        }
-
-        const organization = await orgResponse.json();
-
-        const repoResponse = await fetch(
-          `https://api.github.com/orgs/${org}/repos?per_page=100`
-        );
-
-        const repos = await repoResponse.json();
-
-        const options = repos
-          .slice(0, 25)
-          .map(repo => ({
-            label: repo.name,
-            value: repo.name,
-            description: repo.language ?? "No language"
-          }));
-
-        return res.send({
-          type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
-          data: {
-
-            embeds: [
-              {
-                title: organization.login,
-                description:
-                  organization.description ??
-                  "No description",
-
-                url: organization.html_url,
-
-                thumbnail: {
-                  url: organization.avatar_url
-                },
-
-                fields: [
-                  {
-                    name: "Followers",
-                    value: String(organization.followers),
-                    inline: true
-                  },
-                  {
-                    name: "Following",
-                    value: String(organization.following),
-                    inline: true
-                  },
-                  {
-                    name: "Repositories",
-                    value: String(organization.public_repos),
-                    inline: true
-                  }
-                ]
-              }
-            ],
-
-            components: [
-              {
-                type: 1,
-                components: [
-                  {
-                    type: 3,
-                    custom_id: `repo_select:${org}`,
-                    placeholder: "Select Repository",
-                    options
-                  }
-                ]
-              }
-            ]
-          }
-        });
-      }
-
-      return res.status(400).json({
-        error: "Unknown command"
-      });
-    }
-
-    // -------------------------------------
-    // Select Menu Interaction
-    // -------------------------------------
-
-    if (type === InteractionType.MESSAGE_COMPONENT) {
-
-      const repo = data.values[0];
-
-      const [, org] = data.custom_id.split(":");
-
-      const response = await fetch(
-        `https://api.github.com/repos/${org}/${repo}`
+      const username=data.options[0].value;
+      const response=await fetch(
+      `https://api.github.com/users/${username}`
       );
 
-      if (!response.ok) {
-        return res.send({
-          type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
-          data: {
-            content: "❌ Repository not found."
-          }
-        });
-      }
-
-      const repoData = await response.json();
+      const user=await response.json();
 
       return res.send({
+          type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+          data: {
+              embeds: [
+                  {
+                      title: user.login,
+                      description: user.bio,
+                      url: user.html_url,
 
-        // Edit the existing message
-        type: InteractionResponseType.UPDATE_MESSAGE,
-
-        data: {
-
-          embeds: [
-            {
-              title: repoData.full_name,
-
-              description:
-                repoData.description ??
-                "No description",
-
-              url: repoData.html_url,
-
-              thumbnail: {
-                url: repoData.owner.avatar_url
-              },
-
-              fields: [
-                {
-                  name: "⭐ Stars",
-                  value: String(repoData.stargazers_count),
-                  inline: true
-                },
-                {
-                  name: "🍴 Forks",
-                  value: String(repoData.forks_count),
-                  inline: true
-                },
-                {
-                  name: "💻 Language",
-                  value: repoData.language ?? "None",
-                  inline: true
-                },
-                {
-                  name: "🐞 Open Issues",
-                  value: String(repoData.open_issues_count),
-                  inline: true
-                },
-                {
-                  name: "🌿 Default Branch",
-                  value: repoData.default_branch,
-                  inline: true
-                },
-                {
-                  name: "📄 License",
-                  value: repoData.license?.name ?? "None",
-                  inline: true
-                }
+                      thumbnail: {
+                          url: user.avatar_url
+                      },
+                      fields: [
+                          {
+                              name: "Followers",
+                              value: `${user.followers}`,
+                              inline: true
+                          },
+                          {
+                              name: "Following",
+                              value: `${user.following}`,
+                              inline: true
+                          },
+                          {
+                              name: "Repositories",
+                              value: `${user.public_repos}`,
+                              inline: true
+                          }
+                      ]
+                  }
               ]
-            }
-          ],
-
-          components: []
-        }
+          }
       });
+
     }
 
-    return res.status(400).json({
-      error: "Unknown interaction type"
-    });
+    if(name === "orgs"){
+      const org = data.options[0].value;
+
+      const response = await fetch(
+        `https://api.github.com/orgs/${org}`
+      )
+
+      const orgs = await response.json();
+
+      const reporesponse = await fetch(
+          `https://api.github.com/orgs/${org}/repos?per_page=100`
+      );
+
+      const repos = await reporesponse.json();
+
+      const repoList = repos.map(repo => `[${repo.name}](${repo.html_url})`).join("\n");
+
+      // const options = repos.map((repo) => ({
+      //     label: repo.name,
+      //     value: repo.name,
+      //     description: repo.language ?? "No language"
+      // }));
+
+      return res.send({
+        type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+        data:{
+          embeds: [
+            {
+              title:orgs.login,
+              description:orgs.description,
+              url:orgs.html_url,
+              website:orgs.blog,
+
+              thumbnail:{
+                url:orgs.avatar_url
+              },
+              fields: [
+                        {
+                            name: "Followers",
+                            value: `${orgs.followers}`,
+                            inline: true
+                        },
+                        {
+                            name: "Following",
+                            value: `${orgs.following}`,
+                            inline: true
+                        },
+                        {
+                            name: "Repositories",
+                            value: `${orgs.public_repos}`,
+                            inline: true
+                        },
+                        {
+                          name: " Repositories List",
+                          value: repoList
+                        }
+              ],
+            }]
+    }})
+
+
+
+    console.error(`unknown command: ${name}`);
+    return res.status(400).json({ error: 'unknown command' });
   }
-);
+
+  console.error('unknown interaction type', type);
+  return res.status(400).json({ error: 'unknown interaction type' });
+});
+
+
+// Server is Running on PORT
 
 app.listen(PORT, () => {
-  console.log(`Server listening on port ${PORT}`);
+  console.log('Listening on port', PORT);
 });
