@@ -84,23 +84,23 @@ app.post('/interactions', verifyKeyMiddleware(process.env.PUBLIC_KEY), async fun
           /**
            * Handle requests from interactive components
            */
-          if (type === InteractionType.MESSAGE_COMPONENT) {
-            // custom_id set in payload when sending message component
-            const componentId = data.custom_id;
-            // user who clicked button
-            const userId = req.body.member.user.id;
+  if (type === InteractionType.MESSAGE_COMPONENT) {
+    // custom_id set in payload when sending message component
+    const componentId = data.custom_id;
+    // user who clicked button
+    const userId = req.body.member.user.id;
 
-            if (componentId === 'my_button') {
-              console.log(req.body);
-              return res.send({
-                type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
-                data: { content: `<@${userId}> clicked the button` },
-              });
-            }
-          }
+    if (componentId === 'my_button') {
+      console.log(req.body);
+      return res.send({
+        type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+        data: { content: `<@${userId}> clicked the button` },
+      });
+    }
+  }
 
 
-    if(name==="github"){
+    if(name === "github"){
 
       const username=data.options[0].value;
       const response=await fetch(

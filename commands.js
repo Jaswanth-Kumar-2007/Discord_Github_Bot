@@ -77,11 +77,11 @@ const ALL_COMMANDS = [TEST_COMMAND,GITHUB_COMMAND,ORG_COMMAND];
 
 console.log("Registering commands...");
 // await InstallGlobalCommands(process.env.APP_ID, ALL_COMMANDS);
-// await InstallGuildCommands(
-//   process.env.APP_ID,
-//   process.env.GUILD_ID,
-//   ALL_COMMANDS
-// );
+await InstallGuildCommands(
+  process.env.APP_ID,
+  process.env.GUILD_ID,
+  ALL_COMMANDS
+);
 console.log("Commands registered successfully!");
 
 
