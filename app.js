@@ -70,28 +70,40 @@ app.post('/interactions', verifyKeyMiddleware(process.env.PUBLIC_KEY), async fun
 
       const user=await response.json();
 
-        return res.send({
+      return res.send({
+          type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+          data: {
+              embeds: [
+                  {
+                      title: user.login,
+                      description: user.bio,
+                      url: user.html_url,
 
-        type:
-        InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+                      thumbnail: {
+                          url: user.avatar_url
+                      },
 
-        data:{
-
-        content:`
-
-        User : ${user.login}
-
-        Followers : ${user.followers}
-
-        Repos : ${user.public_repos}
-
-        Bio : ${user.bio}
-
-        `
-
-        }
-
-        });
+                      fields: [
+                          {
+                              name: "Followers",
+                              value: `${user.followers}`,
+                              inline: true
+                          },
+                          {
+                              name: "Following",
+                              value: `${user.following}`,
+                              inline: true
+                          },
+                          {
+                              name: "Repositories",
+                              value: `${user.public_repos}`,
+                              inline: true
+                          }
+                      ]
+                  }
+              ]
+          }
+      });
 
     }
 
