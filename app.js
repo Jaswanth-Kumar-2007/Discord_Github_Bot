@@ -75,6 +75,7 @@ app.post('/interactions', verifyKeyMiddleware(process.env.PUBLIC_KEY), async fun
       );
 
       const user=await response.json();
+
       return res.send({
           type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
           data: {
@@ -113,41 +114,40 @@ app.post('/interactions', verifyKeyMiddleware(process.env.PUBLIC_KEY), async fun
 
     if(name === "orgs"){
       const org = data.options[0].value;
-      const repo = data.options[1].value;
 
       const response = await fetch(
         `https://api.github.com/orgs/${org}`
       )
 
-      const data = await response.json();
+      const orgs = await response.json();
 
       return res.send({
         type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
         data:{
           embeds: [
             {
-              title:data.login,
-              description:data.description,
-              url:data.html_url,
-              website:data.blog,
+              title:orgs.login,
+              description:orgs.description,
+              url:orgs.html_url,
+              website:orgs.blog,
 
               thumbnail:{
-                url:user.avatar_url
+                url:orgs.avatar_url
               },
               fields: [
                         {
                             name: "Followers",
-                            value: `${user.followers}`,
+                            value: `${orgs.followers}`,
                             inline: true
                         },
                         {
                             name: "Following",
-                            value: `${user.following}`,
+                            value: `${orgs.following}`,
                             inline: true
                         },
                         {
                             name: "Repositories",
-                            value: `${user.public_repos}`,
+                            value: `${orgs.public_repos}`,
                             inline: true
                         }
               ]
