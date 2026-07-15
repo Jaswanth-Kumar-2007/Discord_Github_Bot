@@ -58,6 +58,43 @@ app.post('/interactions', verifyKeyMiddleware(process.env.PUBLIC_KEY), async fun
       });
     }
 
+    if(name==="github"){
+
+      const username=data.options[0].value;
+
+      const response=await fetch(
+
+      `https://api.github.com/users/${username}`
+
+      );
+
+      const user=await response.json();
+
+        return res.send({
+
+        type:
+        InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+
+        data:{
+
+        content:`
+
+        User : ${user.login}
+
+        Followers : ${user.followers}
+
+        Repos : ${user.public_repos}
+
+        Bio : ${user.bio}
+
+        `
+
+        }
+
+        });
+
+    }
+
     console.error(`unknown command: ${name}`);
     return res.status(400).json({ error: 'unknown command' });
   }

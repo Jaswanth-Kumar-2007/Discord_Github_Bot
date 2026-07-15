@@ -1,6 +1,6 @@
 import 'dotenv/config';
 import { getRPSChoices } from './game.js';
-import { capitalize, InstallGlobalCommands } from './utils.js';
+import { capitalize, InstallGuildCommands } from './utils.js';
 
 // Get the game choices from game.js
 function createCommandChoices() {
@@ -44,6 +44,39 @@ const CHALLENGE_COMMAND = {
   contexts: [0, 2],
 };
 
-const ALL_COMMANDS = [TEST_COMMAND, CHALLENGE_COMMAND];
+const GITHUB_COMMAND={
 
-InstallGlobalCommands(process.env.APP_ID, ALL_COMMANDS);
+name:"github",
+
+description:"Search GitHub",
+
+options:[
+
+{
+
+type:3,
+
+name:"username",
+
+description:"GitHub username",
+
+required:true
+
+}
+
+]
+
+}
+
+const ALL_COMMANDS = [TEST_COMMAND, CHALLENGE_COMMAND,GITHUB_COMMAND];
+
+console.log("Registering commands...");
+// await InstallGlobalCommands(process.env.APP_ID, ALL_COMMANDS);
+await InstallGuildCommands(
+  process.env.APP_ID,
+  process.env.GUILD_ID,
+  ALL_COMMANDS
+);
+console.log("Commands registered successfully!");
+
+
