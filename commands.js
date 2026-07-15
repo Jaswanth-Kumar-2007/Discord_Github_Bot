@@ -27,48 +27,54 @@ const TEST_COMMAND = {
 };
 
 // Command containing options
-const CHALLENGE_COMMAND = {
-  name: 'challenge',
-  description: 'Challenge to a match of rock paper scissors',
-  options: [
-    {
-      type: 3,
-      name: 'object',
-      description: 'Pick your object',
-      required: true,
-      choices: createCommandChoices(),
-    },
-  ],
-  type: 1,
-  integration_types: [0, 1],
-  contexts: [0, 2],
-};
+// const CHALLENGE_COMMAND = {
+//   name: 'challenge',
+//   description: 'Challenge to a match of rock paper scissors',
+//   options: [
+//     {
+//       type: 3,
+//       name: 'object',
+//       description: 'Pick your object',
+//       required: true,
+//       choices: createCommandChoices(),
+//     },
+//   ],
+//   type: 1,
+//   integration_types: [0, 1],
+//   contexts: [0, 2],
+// };
 
 const GITHUB_COMMAND={
-
-name:"github",
-
-description:"Search GitHub",
-
-options:[
-
-{
-
-type:3,
-
-name:"username",
-
-description:"GitHub username",
-
-required:true
-
+  name:"github",
+  description:"Search GitHub",
+  options:[
+    {
+      type:3,
+      name:"username",
+      description:"GitHub username",
+      required:true
+    }
+  ],
+  integration_types: [0, 1],
+  contexts: [0, 1, 2],
 }
 
-]
-
+const ORG_COMMAND = {
+  name:'orgs',
+  description:'Search Organisation',
+  options:[
+    {
+      type:3,
+      name:"organisation",
+      description:"Organisation Name",
+      required:true
+    }
+  ],
+  integration_types: [0, 1],
+  contexts: [0, 1, 2],
 }
 
-const ALL_COMMANDS = [TEST_COMMAND, CHALLENGE_COMMAND,GITHUB_COMMAND];
+const ALL_COMMANDS = [TEST_COMMAND,GITHUB_COMMAND,ORG_COMMAND];
 
 console.log("Registering commands...");
 // await InstallGlobalCommands(process.env.APP_ID, ALL_COMMANDS);

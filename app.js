@@ -70,15 +70,11 @@ app.post('/interactions', verifyKeyMiddleware(process.env.PUBLIC_KEY), async fun
     if(name==="github"){
 
       const username=data.options[0].value;
-
       const response=await fetch(
-
       `https://api.github.com/users/${username}`
-
       );
 
       const user=await response.json();
-
       return res.send({
           type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
           data: {
@@ -91,7 +87,6 @@ app.post('/interactions', verifyKeyMiddleware(process.env.PUBLIC_KEY), async fun
                       thumbnail: {
                           url: user.avatar_url
                       },
-
                       fields: [
                           {
                               name: "Followers",
@@ -114,6 +109,52 @@ app.post('/interactions', verifyKeyMiddleware(process.env.PUBLIC_KEY), async fun
           }
       });
 
+    }
+
+    if(name === "orgs"){
+      const org = data.options[0].value;
+      const repo = data.options[1].value;
+
+      const response = await fetch(
+        `https://api.github.com/orgs/${org}`
+      )
+
+      const data = await response.json();
+
+      return res.send({
+        type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+        data:{
+          embeds: [
+            {
+              title:data.login,
+              description:data.description,
+              url:data.html_url,
+              website:data.blog,
+
+              thumbnail:{
+                url:user.avatar_url
+              },
+              fields: [
+                        {
+                            name: "Followers",
+                            value: `${user.followers}`,
+                            inline: true
+                        },
+                        {
+                            name: "Following",
+                            value: `${user.following}`,
+                            inline: true
+                        },
+                        {
+                            name: "Repositories",
+                            value: `${user.public_repos}`,
+                            inline: true
+                        }
+              ]
+            }
+          ]
+        }
+      })
     }
 
     console.error(`unknown command: ${name}`);
