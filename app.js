@@ -137,12 +137,12 @@ app.post('/interactions', verifyKeyMiddleware(process.env.PUBLIC_KEY), async fun
       const orgs = await response.json();
 
       const reporesponse = await fetch(
-          `https://api.github.com/orgs/${org}/repos?per_page=100`
+          `https://api.github.com/orgs/${org}/repos?per_page=25`
       );
 
       const repos = await reporesponse.json();
 
-      const repoList = repos.map(repo => `[${repo.name}](${repo.html_url})`).join(",");
+      const repoList = repos.map(repo => `[${repo.name}](${repo.html_url})`).join("\n");
 
       // const options = repos.map((repo) => ({
       //     label: repo.name,
