@@ -81,23 +81,6 @@ app.post('/interactions', verifyKeyMiddleware(process.env.PUBLIC_KEY), async fun
     }
   }
 
-          /**
-           * Handle requests from interactive components
-           */
-  if (type === InteractionType.MESSAGE_COMPONENT) {
-    // custom_id set in payload when sending message component
-    const componentId = data.custom_id;
-    // user who clicked button
-    const userId = req.body.member.user.id;
-
-    if (componentId === 'my_button') {
-      console.log(req.body);
-      return res.send({
-        type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
-        data: { content: `<@${userId}> clicked the button` },
-      });
-    }
-  }
 
 
     if(name === "github"){
@@ -176,7 +159,6 @@ app.post('/interactions', verifyKeyMiddleware(process.env.PUBLIC_KEY), async fun
               title:orgs.login,
               description:orgs.description,
               url:orgs.html_url,
-              website:orgs.blog,
 
               thumbnail:{
                 url:orgs.avatar_url
@@ -204,6 +186,24 @@ app.post('/interactions', verifyKeyMiddleware(process.env.PUBLIC_KEY), async fun
               ],
             }]
     }})
+
+          /**
+           * Handle requests from interactive components
+           */
+      if (type === InteractionType.MESSAGE_COMPONENT) {
+        // custom_id set in payload when sending message component
+        const componentId = data.custom_id;
+        // user who clicked button
+        const userId = req.body.member.user.id;
+
+        if (componentId === 'my_button') {
+          console.log(req.body);
+          return res.send({
+            type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+            data: { content: `<@${userId}> clicked the button` },
+          });
+        }
+      }
 
 
 
